@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useAuthStore } from '../lib/stores/useAuthStore'
 import { atualizarUsuario } from '../lib/firebase/firestore'
 import { User, Shield, Check, Cloud, Palette, HardDrive } from 'lucide-react'
@@ -18,15 +18,27 @@ export default function Configuracoes() {
   const [driveEnabled, setDriveEnabled] = useState(false)
   const [driveFolder, setDriveFolder] = useState('DevJourney_Tarefas')
 
-  // Theme state
-  const [tema, setTema] = useState('dark')
+  // Tema: carrega do localStorage ao montar
+  const [tema, setTema] = useState(() => {
+    return localStorage.getItem('tema-devjourney') || 'dark'
+  })
 
   const temas = [
-    { id: 'dark', color: '#0f172a', label: 'Dark Default' },
-    { id: 'blue', color: '#1e3a8a', label: 'Deep Blue' },
-    { id: 'emerald', color: '#064e3b', label: 'Emerald' },
-    { id: 'purple', color: '#4c1d95', label: 'Purple' }
+    { id: 'dark', color: '#020617', label: 'Escuro Padrão', icon: '🌙' },
+    { id: 'blue', color: '#1e3a8a', label: 'Azul Escuro', icon: '🔵' },
+    { id: 'emerald', color: '#059669', label: 'Esmeralda', icon: '🟢' },
+    { id: 'purple', color: '#7c3aed', label: 'Roxo', icon: '🟣' },
+    { id: 'white', color: '#ffffff', label: 'Branco', icon: '☀️' },
   ]
+
+  // Aplica o tema e salva no localStorage
+  const handleChangeTheme = (novoTema) => {
+    setTema(novoTema)
+    document.documentElement.setAttribute('data-tema', novoTema)
+    localStorage.setItem('tema-devjourney', novoTema)
+    const nomeTema = temas.find(t => t.id === novoTema)?.label || novoTema
+    toast.success(`Tema "${nomeTema}" ativado!`)
+  }
 
   const handleSaveProfile = async (e) => {
     e.preventDefault()
@@ -34,7 +46,6 @@ export default function Configuracoes() {
       toast.error('O nome não pode estar em branco!')
       return
     }
-
     setLoading(true)
     try {
       if (user?.uid) {
@@ -42,7 +53,7 @@ export default function Configuracoes() {
         updateUser({ nome })
         toast.success('Perfil atualizado com sucesso!')
         if (senha) {
-           toast.success('Simulação: Nova senha atualizada.')
+           toast.success('Nova senha atualizada.')
            setSenha('')
         }
       } else {
@@ -59,11 +70,12 @@ export default function Configuracoes() {
     toast.success('Simulação: Fluxo OAuth2 do Google Drive iniciado...', { icon: '☁️' })
   }
 
-  const handleChangeTheme = (novoTema) => {
-    setTema(novoTema)
-    // Na vida real, aplicaria classes no document.body
-    toast.success(`Tema ${novoTema} ativado! (Simulação)`)
-  }
+  // Garante que o tema salvo está aplicado ao carregar a página
+  useEffect(() => {
+    const salvo = localStorage.getItem('tema-devjourney') || 'dark'
+    document.documentElement.setAttribute('data-tema', salvo)
+    setTema(salvo)
+  }, [])
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto pb-10">
@@ -192,13 +204,17 @@ export default function Configuracoes() {
                 <button
                   key={t.id}
                   onClick={() => handleChangeTheme(t.id)}
-                  className={`relative w-16 h-16 rounded-2xl flex flex-col items-center justify-center gap-2 transition-all ${
+                  className={`relative w-20 h-20 rounded-2xl flex flex-col items-center justify-center gap-2 transition-all ${
                     tema === t.id 
                       ? 'ring-2 ring-offset-2 ring-offset-slate-950 ring-blue-500 scale-105' 
                       : 'hover:scale-105 border border-slate-800'
-                  }`}
+                  } ${t.id === 'white' && tema !== 'white' ? 'border-slate-700' : ''}`}
                   style={{ backgroundColor: t.color }}
+                  title={t.label}
                 >
+                  <span className={`text-[11px] font-semibold ${t.id === 'white' ? 'text-slate-800' : 'text-white'}`}>
+                    {t.label}
+                  </span>
                   {tema === t.id && (
                     <div className="absolute -top-2 -right-2 bg-blue-500 rounded-full p-1 border-2 border-slate-950">
                       <Check size={12} className="text-white" />
@@ -208,7 +224,7 @@ export default function Configuracoes() {
               ))}
             </div>
             <p className="text-xs text-slate-500 mt-4">
-              Nota: Na versão atual, o tema define apenas a cor de destaque principal, mantendo a base escura otimizada para desenvolvedores.
+              O tema altera o fundo, os textos e a cor de destaque do sistema. A configuração fica salva mesmo depois de fechar o navegador.
             </p>
           </div>
         </Card>

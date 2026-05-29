@@ -4,46 +4,148 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================
+   SISTEMA DE TEMAS — Slate Palette
+   Cada tema redefine todas as variáveis --slate-*
+   no formato "R G B" para suportar opacity modifiers
+   ============================================ */
+
+:root, [data-tema="dark"] {
+  --slate-50: 248 250 252;
+  --slate-100: 241 245 249;
+  --slate-200: 226 232 240;
+  --slate-300: 203 213 225;
+  --slate-400: 148 163 184;
+  --slate-500: 100 116 139;
+  --slate-600: 71 85 105;
+  --slate-700: 51 65 85;
+  --slate-800: 30 41 59;
+  --slate-900: 15 23 42;
+  --slate-950: 2 6 23;
+  --slate-350: 176 188 204;
+  --slate-450: 124 140 162;
+  --slate-550: 86 101 122;
+  --slate-750: 41 53 72;
+  --slate-850: 23 32 51;
+  --acento: #3b82f6;
+  --acento-hover: #2563eb;
+  --acento-claro: rgba(59, 130, 246, 0.1);
+}
+
+[data-tema="blue"] {
+  --slate-50: 238 242 250;
+  --slate-100: 219 228 245;
+  --slate-200: 191 207 235;
+  --slate-300: 156 180 222;
+  --slate-400: 120 148 198;
+  --slate-500: 85 115 170;
+  --slate-600: 60 85 145;
+  --slate-700: 40 60 115;
+  --slate-800: 25 40 85;
+  --slate-900: 15 25 55;
+  --slate-950: 8 14 35;
+  --slate-350: 140 164 210;
+  --slate-450: 102 132 184;
+  --slate-550: 72 100 158;
+  --slate-750: 32 50 100;
+  --slate-850: 20 32 70;
+  --acento: #3b82f6;
+  --acento-hover: #2563eb;
+  --acento-claro: rgba(59, 130, 246, 0.1);
+}
+
+[data-tema="emerald"] {
+  --slate-50: 236 250 242;
+  --slate-100: 210 240 222;
+  --slate-200: 180 225 200;
+  --slate-300: 145 205 175;
+  --slate-400: 105 180 145;
+  --slate-500: 70 150 115;
+  --slate-600: 45 120 90;
+  --slate-700: 30 90 70;
+  --slate-800: 20 65 50;
+  --slate-900: 12 40 30;
+  --slate-950: 6 25 18;
+  --slate-350: 125 193 160;
+  --slate-450: 88 165 130;
+  --slate-550: 58 135 102;
+  --slate-750: 25 78 60;
+  --slate-850: 16 52 40;
+  --acento: #059669;
+  --acento-hover: #047857;
+  --acento-claro: rgba(5, 150, 105, 0.15);
+}
+
+[data-tema="purple"] {
+  --slate-50: 245 240 250;
+  --slate-100: 235 225 245;
+  --slate-200: 220 205 235;
+  --slate-300: 200 180 222;
+  --slate-400: 175 150 205;
+  --slate-500: 145 115 185;
+  --slate-600: 115 85 160;
+  --slate-700: 85 55 130;
+  --slate-800: 55 35 95;
+  --slate-900: 35 20 60;
+  --slate-950: 20 10 35;
+  --slate-350: 188 165 213;
+  --slate-450: 160 132 195;
+  --slate-550: 130 100 172;
+  --slate-750: 70 45 112;
+  --slate-850: 45 28 78;
+  --acento: #7c3aed;
+  --acento-hover: #6d28d9;
+  --acento-claro: rgba(124, 58, 237, 0.15);
+}
+
+[data-tema="white"] {
+  --slate-50: 15 23 42;
+  --slate-100: 30 41 59;
+  --slate-200: 51 65 85;
+  --slate-300: 71 85 105;
+  --slate-400: 100 116 139;
+  --slate-500: 148 163 184;
+  --slate-600: 203 213 225;
+  --slate-700: 226 232 240;
+  --slate-800: 241 245 249;
+  --slate-900: 248 250 252;
+  --slate-950: 255 255 255;
+  --slate-350: 61 75 95;
+  --slate-450: 86 101 122;
+  --slate-550: 124 140 162;
+  --slate-750: 215 223 233;
+  --slate-850: 234 239 245;
+  --acento: #2563eb;
+  --acento-hover: #1d4ed8;
+  --acento-claro: rgba(37, 99, 235, 0.08);
+}
+
+/* Utilitários de tema */
+.bg-acento { background-color: var(--acento); }
+.bg-acento-claro { background-color: var(--acento-claro); }
+.texto-acento { color: var(--acento); }
+.borda-acento { border-color: var(--acento); }
+.hover\:bg-acento-hover:hover { background-color: var(--acento-hover); }
+
+.active-nav-link {
+  background: var(--acento-claro);
+  border-left: 3px solid var(--acento);
+  color: var(--acento);
+}
+
 @layer base {
   body {
-    background-color: #020617; /* Slate-950 */
-    color: #f8fafc; /* Slate-50 */
+    background-color: rgb(var(--slate-950));
+    color: rgb(var(--slate-100));
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   }
-
-  /* Custom Scrollbar */
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: #020617;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #1e293b;
-    border-radius: 4px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: #334155;
-  }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: rgb(var(--slate-950)); }
+  ::-webkit-scrollbar-thumb { background: rgb(var(--slate-800)); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgb(var(--slate-700)); }
 }
 
-/* React Router Active Navigation Links custom transitions */
-.active-nav-link {
-  background: rgba(59, 130, 246, 0.1);
-  border-left: 3px solid #3b82f6;
-  color: #3b82f6;
-}
-
-/* Utility to hide input spins */
+/* Esconder setas input number */
 input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-input[type=number] {
-  -moz-appearance: textfield;
-}
+input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; }

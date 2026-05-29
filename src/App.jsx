@@ -65,6 +65,12 @@ function AppLayout({ children }) {
 
 function App() {
   useEffect(() => {
+    // Carrega tema salvo do localStorage e aplica no <html>
+    const temaSalvo = localStorage.getItem('tema-devjourney') || 'dark'
+    document.documentElement.setAttribute('data-tema', temaSalvo)
+  }, [])
+
+  useEffect(() => {
     initFirebaseCache()
     
     if ('serviceWorker' in navigator) {

@@ -44,3 +44,24 @@
   border-color: rgba(59, 130, 246, 0.3);
   transform: translateY(-2px);
 }
+
+/* Animação de surgimento do balão de notificações (Desktop) */
+@keyframes slide-down {
+  0% { transform: translateY(-8px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+/* Animação de surgimento lateral da direita para esquerda (Mobile) */
+@keyframes slide-left-full {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(0); }
+}
+
+.animate-slide-down {
+  animation: slide-down 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-left-full {
+  animation: slide-left-full 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+

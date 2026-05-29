@@ -215,3 +215,37 @@ export const obterMapaMental = async (usuarioId) => {
   return snap.data()
 }
 
+// ============ NOTIFICAÇÕES ============
+export const salvarNotificacao = async (usuarioId, dados) => {
+  const notificacoesRef = collection(db, 'usuarios', usuarioId, 'notificacoes')
+  const docRef = await addDoc(notificacoesRef, {
+    ...dados,
+    criado_em: Timestamp.now()
+  })
+  return docRef.id
+}
+
+export const listarNotificacoes = async (usuarioId) => {
+  const notificacoesRef = collection(db, 'usuarios', usuarioId, 'notificacoes')
+  const snapshot = await getDocs(notificacoesRef)
+  const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+  return docs.sort((a, b) => (b.criado_em?.seconds || 0) - (a.criado_em?.seconds || 0))
+}
+
+export const atualizarNotificacao = async (usuarioId, id, dados) => {
+  const notificacaoRef = doc(db, 'usuarios', usuarioId, 'notificacoes', id)
+  await updateDoc(notificacaoRef, dados)
+}
+
+export const marcarTodasNotificacoesLidas = async (usuarioId) => {
+  const notificacoesRef = collection(db, 'usuarios', usuarioId, 'notificacoes')
+  const q = query(notificacoesRef, where('naoLida', '==', true))
+  const snapshot = await getDocs(q)
+  const promessas = snapshot.docs.map(documento => {
+    const docRef = doc(db, 'usuarios', usuarioId, 'notificacoes', documento.id)
+    return updateDoc(docRef, { naoLida: false })
+  })
+  await Promise.all(promessas)
+}
+
+

@@ -2,12 +2,25 @@ import React, { useEffect, useState } from 'react'
 import { Menu, Wifi, WifiOff, Bell, User } from 'lucide-react'
 import { useAuthStore } from '../../lib/stores/useAuthStore'
 import { useLocation } from 'react-router-dom'
+import PainelNotificacoes from './PainelNotificacoes'
+import { useNotificacoesStore } from '../../lib/stores/useNotificacoesStore'
 
 export default function Header({ onMenuClick }) {
   const { user } = useAuthStore()
   const location = useLocation()
   const [isOnline, setIsOnline] = useState(navigator.onLine)
+  const [painelAberto, setPainelAberto] = useState(false)
 
+  const {
+    notificacoes,
+    carregarNotificacoes,
+    alternarLida,
+    marcarTodasComoLidas,
+    responderCompartilhamento,
+    deletarNotificacao
+  } = useNotificacoesStore()
+
+  // Sincroniza estado de rede online/offline
   useEffect(() => {
     const handleOnline = () => setIsOnline(true)
     const handleOffline = () => setIsOnline(false)
@@ -21,6 +34,26 @@ export default function Header({ onMenuClick }) {
     }
   }, [])
 
+  // Carrega notificações do Firestore ao inicializar ou mudar de usuário
+  useEffect(() => {
+    if (user?.id) {
+      carregarNotificacoes(user.id)
+    }
+  }, [user?.id, carregarNotificacoes])
+
+  // Fecha o painel ao detectar clique em qualquer área externa do documento
+  useEffect(() => {
+    if (!painelAberto) return
+    const fecharAoClicarFora = () => setPainelAberto(false)
+    const id = setTimeout(() => {
+      document.addEventListener('click', fecharAoClicarFora)
+    }, 100)
+    return () => {
+      clearTimeout(id)
+      document.removeEventListener('click', fecharAoClicarFora)
+    }
+  }, [painelAberto])
+
   const getPageTitle = () => {
     switch (location.pathname) {
       case '/': return 'Painel Geral'
@@ -32,6 +65,11 @@ export default function Header({ onMenuClick }) {
       default: return 'Área do Aluno'
     }
   }
+
+  // Calcula o total de notificações não lidas
+  const totalNaoLidas = (notificacoes || []).filter(
+    n => n.naoLida && (n.aba || 'geral') !== 'arquivadas'
+  ).length
 
   return (
     <header className="bg-slate-900/50 backdrop-blur-md border-b border-slate-800/60 px-6 py-4 flex items-center justify-between sticky top-0 z-30">
@@ -69,11 +107,33 @@ export default function Header({ onMenuClick }) {
           )}
         </div>
 
-        {/* Notificações de Demonstração */}
-        <button className="text-slate-400 hover:text-slate-200 p-2 hover:bg-slate-800 rounded-xl transition relative">
-          <Bell size={18} />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full" />
-        </button>
+        {/* Notificações com Painel Acoplado */}
+        <div className="relative">
+          <button 
+            onClick={(e) => {
+              e.stopPropagation()
+              setPainelAberto(!painelAberto)
+            }}
+            className="text-slate-400 hover:text-slate-200 p-2 hover:bg-slate-800 rounded-xl transition relative"
+            aria-label="Notificações"
+          >
+            <Bell size={18} />
+            {totalNaoLidas > 0 && (
+              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-blue-500 rounded-full ring-2 ring-slate-900 animate-pulse" />
+            )}
+          </button>
+
+          <PainelNotificacoes
+            aberto={painelAberto}
+            onFechar={() => setPainelAberto(false)}
+            notificacoes={notificacoes}
+            onMarcarTodasLidas={() => user?.id && marcarTodasComoLidas(user.id)}
+            onAlternarLida={(id) => user?.id && alternarLida(user.id, id)}
+            onAceitarCompartilhamento={(id) => user?.id && responderCompartilhamento(user.id, id, true)}
+            onRecusarCompartilhamento={(id) => user?.id && responderCompartilhamento(user.id, id, false)}
+            onDeletarNotificacao={(id) => user?.id && deletarNotificacao(user.id, id)}
+          />
+        </div>
 
         {/* Informações do Usuário */}
         <div className="flex items-center gap-3 border-l border-slate-800/80 pl-4">
@@ -96,3 +156,4 @@ export default function Header({ onMenuClick }) {
     </header>
   )
 }
+

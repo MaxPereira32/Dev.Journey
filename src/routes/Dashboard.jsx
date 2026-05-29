@@ -53,9 +53,10 @@ export default function Dashboard() {
   const totalHoras = disciplinas.reduce((acc, curr) => acc + (Number(curr.horas_registradas) || 0), 0)
   const tarefasPendentes = tarefas.filter(t => t.status === 'pendente' && t.mostrar_dashboard !== false)
   
-  // Simulando exercícios (não temos no store ainda)
-  const totalExercicios = 45
-  const exerciciosConcluidos = 12
+  // Calcula exercícios a partir das disciplinas
+  const totalExercicios = disciplinas.reduce((acc, disc) => acc + (disc.exercicios?.length || 0), 0)
+  const exerciciosConcluidos = disciplinas.reduce((acc, disc) => acc + (disc.exercicios_resolvidos || 0), 0)
+  const progressoExercicios = totalExercicios > 0 ? Math.round((exerciciosConcluidos / totalExercicios) * 100) : 0
 
   return (
     <div className="space-y-8 pb-10">
@@ -112,12 +113,12 @@ export default function Dashboard() {
           </div>
           <div>
             <div className="text-4xl font-display font-bold text-slate-100 mb-3">
-              {Math.round((exerciciosConcluidos/totalExercicios)*100)}%
+              {progressoExercicios}%
             </div>
             <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
               <div 
                 className="bg-purple-500 h-full rounded-full transition-all" 
-                style={{ width: `${(exerciciosConcluidos/totalExercicios)*100}%` }}
+                style={{ width: `${progressoExercicios}%` }}
               />
             </div>
           </div>
